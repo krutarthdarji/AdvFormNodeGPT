@@ -8,7 +8,7 @@ chain = get_llm_chain()
 
 
 @app.route("/generate-schema", methods=["POST"])
-def generate_schema():
+async def generate_schema():
     """
     Expects a JSON body: { "description": "some requirement" }
     Returns a JSON: { "schema": "...model output..." }
@@ -17,11 +17,10 @@ def generate_schema():
         data = request.get_json()
         user_requirement = data.get("description", "")
         # Generate the schema from user requirement
-        result = chain.run(user_requirement=user_requirement)
+        result = await chain.invoke({"user_requirement": user_requirement})
 
         # The result is presumably a JSON string.
         # Optionally, we can attempt to parse it to confirm validity, then re-dump as JSON.
-        # For simplicity, we'll just return it as a string.
         return jsonify({"schema": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
